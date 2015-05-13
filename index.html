@@ -57,7 +57,7 @@
                 resolveURL(url,wallID,firebase.child("walls"));
             }
             else if(wallID) {
-                wallbase.child("registry").child(wallID).on("value",
+                firebase.child("walls").child("registry").child(wallID).on("value",
                     function(snapshot) {
                         var data = snapshot.val();
                         updateImageWall(data,document.getElementById("imageWall"));
