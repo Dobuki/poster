@@ -1,26 +1,21 @@
+//function requestSiteImage(wall
+
 function fetchImage(wallID,firebaseNode,callback) {
     
     var wallbase = firebaseNode;
-    wallbase.child("registry").child(wallID).once("value",
+    wallbase.child("registry").child(wallID).on("value",
         function(snapshot) {
             var o = snapshot.val();
             if(o) {
-                if(o.image) {
-                    callback(o);
-                }
-                else {
-                    fetchScreenshot(o.url,
-                        function(imageURL) {
-                            wallbase.child("registry").child(id).child("image").set(imageURL,
-                                function(error) {
-                                    console.log(o);
-                                });
-                        });
-                }
+                callback(o);
             }
         });
     
     function fetchScreenshot(url,callback) {
+        
+        //
+        http://api.page2images.com/restfullink?p2i_url=http://www.dobuki.com&p2i_device=6&p2i_screen=1024x768&p2i_size=300x300&p2i_imageformat=jpg&p2i_wait=0&p2i_key=68a9464390f1efcf
+        
         
         //  REQUEST the image
         var imageURL = "http://free.pagepeeker.com/v2/thumbs.php?size=x&url="+url;

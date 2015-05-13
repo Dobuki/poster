@@ -3,8 +3,8 @@
 <head><title>Wall poster</title>
     <script src="/header.js"></script>
     <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
-    <script src="/lib/react/react.js"></script>
-    <script src="/lib/react/JSXTransformer.js"></script>
+    <script src="../lib/react/react.js"></script>
+    <script src="../lib/react/JSXTransformer.js"></script>
     <script src="http://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/md5.js"></script>
     <script src="resolveurl.js"></script>
     <script src="wallurl.js"></script>
@@ -19,11 +19,17 @@
         <meta property="fb:app_id" content="815492315195047"/-->
 
     <script type="text/jsx">
+        var defaultImage = "http://vignette3.wikia.nocookie.net/the-teens/images/4/44/Facebook_Logo.png";
         var ImageWall = React.createClass({      
             render: function() {
-                var src = this.props.data.image;
-                var url = this.props.data.url;
-                return (<a href={url}><img border="0" style={{maxWidth:"100%",maxHeight:"100%"}} src={src}/></a>);
+                var src = this.props.data ? this.props.data.image : defaultImage;
+                var url = this.props.data ? this.props.data.url : null;
+                if(url) {
+                    return (<a href={url}><img border="0" style={{maxWidth:"100%",maxHeight:"100%"}} src={src}/></a>);
+                }
+                else {
+                    return (<img border="0" style={{maxWidth:"100%",maxHeight:"100%"}} src={src}/>);
+                }
             }
         });
         function updateImageWall(data,element) {
@@ -34,14 +40,15 @@
         var firebase = new Firebase("https://walls.firebaseio.com/");
 
         function getParam(id) {
-            var hash = location.hash.substr(1);
-            var right = hash.split(id+"=")[1];
+            var right = location.hash.substr(1).split(id+"=")[1];
+            if(!right) {
+                var right = location.search.substr(1).split(id+"=")[1];
+            }
             return right?right.split("&")[0]:null;
         }
 
         window.addEventListener("hashchange", initWall);
         document.addEventListener("DOMContentLoaded",initWall);
-        window.addEventListener("load",loadWall);
 
         function initWall() {
             var wallID = getParam("wallID");
@@ -50,26 +57,24 @@
                 resolveURL(url,wallID,firebase.child("walls"));
             }
             else if(wallID) {
-                fetchImage(wallID,firebase.child("walls"),
-                    function(data) {
+                wallbase.child("registry").child(wallID).on("value",
+                    function(snapshot) {
+                        var data = snapshot.val();
                         updateImageWall(data,document.getElementById("imageWall"));
-                    }
-                );
+                        if(!data.image) {
+//                            requestSiteImage(data);
+                        }
+                    });                
             }
             else {
                 console.log("No wallID or url");
+                window.addEventListener("load",
+                    function() {
+                        updateImageWall(null,document.getElementById("imageWall"));
+                });
             }            
         }
         
-        function loadWall() {
-            updateImageWall(
-                {
-                    image:"http://vignette3.wikia.nocookie.net/the-teens/images/4/44/Facebook_Logo.png/revision/latest?cb=20130204020121",
-                    url:"http://www.facebook.com"
-                }
-                ,document.getElementById("imageWall"));
-        }
-
     </script>
 </head>
 <body style="margin:0px; height:100%" >
