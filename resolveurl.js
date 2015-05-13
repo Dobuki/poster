@@ -55,7 +55,7 @@ function resolveURL(url,wallID,firebaseNode) {
     }
 
     function resetPage() {
-        location = "#wallID="+wallID;
+        location = "?wallID="+wallID+"#";
     }
 
     if(!wallID) {
