@@ -31,7 +31,7 @@ function fetchImage(wallID,firebaseNode,callback) {
         
         //  CHECK if it's ready
         var readyURL = "http://free.pagepeeker.com/v2/thumbs_ready.php?size=x&url="+url;
-        var xhr = createCORequest("GET",readyURL);
+        var xhr = createCORSRequest("GET",readyURL);
 
         xhr.onerror = function(error) {
             console.log(error);
