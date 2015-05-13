@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html style="height:100%">
+<head><title>Wall poster</title>
+    <script src="../header.js"></script>
+    <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+    <script src="../build/react.js"></script>
+    <script src="../build/JSXTransformer.js"></script>
+    <script src="http://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/md5.js"></script>
+    <script src="resolveurl.js"></script>
+    <script src="wallurl.js"></script>
+        <!--link rel="icon" href="img/400x400.png" type="image/png"/>
+        <link rel="shortcut icon" href="img/400x400.png" type="image/png"/>
+        <meta property="og:image" content="http://i.imgur.com/fUNfSLh.png" />
+        <meta property="og:url" content="http://jacklehamster.github.io/firebase/feedme/"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:title" content="Feed Me"/>
+        <meta property="og:description" content="Feed FIDO or he will starve" />
+        <meta property="fb:admins" content="530453181"/>
+        <meta property="fb:app_id" content="815492315195047"/-->
+
+    <script type="text/jsx">
+        var ImageWall = React.createClass({      
+            render: function() {
+                var src = this.props.data.image;
+                var url = this.props.data.url;
+                return (<a href={url}><img border="0" style={{maxWidth:"100%",maxHeight:"100%"}} src={src}/></a>);
+            }
+        });
+        function updateImageWall(data,element) {
+            React.render(<ImageWall data={ data }/>,element);
+        }
+    </script>    
+    <script>
+        var firebase = new Firebase("https://walls.firebaseio.com/");
+
+        function getParam(id) {
+            var hash = location.hash.substr(1);
+            var right = hash.split(id+"=")[1];
+            return right?right.split("&")[0]:null;
+        }
+
+        window.addEventListener("hashchange", initWall);
+        document.addEventListener("DOMContentLoaded",initWall);
+        window.addEventListener("load",loadWall);
+
+        function initWall() {
+            var wallID = getParam("wallID");
+            var url = getParam("url");
+            if(url) {
+                resolveURL(url,wallID,firebase.child("walls"));
+            }
+            else if(wallID) {
+                fetchImage(wallID,firebase.child("walls"),
+                    function(data) {
+                        updateImageWall(data,document.getElementById("imageWall"));
+                    }
+                );
+            }
+            else {
+                console.log("No wallID or url");
+            }            
+        }
+        
+        function loadWall() {
+            updateImageWall(
+                {
+                    image:"http://vignette3.wikia.nocookie.net/the-teens/images/4/44/Facebook_Logo.png/revision/latest?cb=20130204020121",
+                    url:"http://www.facebook.com"
+                }
+                ,document.getElementById("imageWall"));
+        }
+
+    </script>
+</head>
+<body style="margin:0px; height:100%" >
+    <div style="width:100%;height:100%; text-align:center" id="imageWall"></div>
+</body>
+
+</html>
