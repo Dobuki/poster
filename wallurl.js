@@ -25,31 +25,46 @@ function fetchImage(wallID,firebaseNode,callback) {
         //  REQUEST the image
         var imageURL = "http://free.pagepeeker.com/v2/thumbs.php?size=x&url="+url;
         var url = new URL(url).href;
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("GET",
-            imageURL
-            ,true);
-        xmlhttp.send();
+        
+        var xhr = createCORSRequest("GET",imageURL);
+        xhr.send();
         
         //  CHECK if it's ready
-        var xmlhttp = new XMLHttpRequest();
         var readyURL = "http://free.pagepeeker.com/v2/thumbs_ready.php?size=x&url="+url;
-        xmlhttp.onreadystatechange=function() {
-          if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                var obj = JSON.parse(xmlhttp.responseText);
+        var xhr = createCORequest("GET",readyURL);
+
+        xhr.onerror = function(error) {
+            console.log(error);
+        };
+        
+        xhr.onload =
+            function(responseText) {
+                var obj = JSON.parse(responseText);
                 if(obj.isReady) {
                     callback(imageURL);
                 }
                 else {
-                    xmlhttp.send();
+                    xhr.send();
                 }
-            }
-        };   
-        xmlhttp.open("GET",
-            readyURL
-            ,true);
-        xmlhttp.send();        
+            });
+        xhr.send();
     }
     
-    
+    // Create the XHR object.
+    function createCORSRequest(method, url) {
+        var xhr = new XMLHttpRequest();
+        if ("withCredentials" in xhr) {
+            // XHR for Chrome/Firefox/Opera/Safari.
+            xhr.open(method, url, true);
+        } else if (typeof XDomainRequest != "undefined") {
+            // XDomainRequest for IE.
+            xhr = new XDomainRequest();
+            xhr.open(method, url);
+        } else {
+            // CORS not supported.
+            xhr = null;
+        }
+        return xhr;
+    }
+
 }
