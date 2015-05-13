@@ -46,7 +46,7 @@ function fetchImage(wallID,firebaseNode,callback) {
                 else {
                     xhr.send();
                 }
-            });
+            };
         xhr.send();
     }
     
